@@ -597,6 +597,8 @@ processBtn.addEventListener("click",()=>{
   // Opacity 20% menjadi default dan diterapkan pada kedua ujung gradien.
   const coordGradient=ctx.createLinearGradient(x,coordY,x+coordW,coordY);
   coordGradient.addColorStop(0,hexToRgba(backgroundColor,backgroundAlpha));
+  coordGradient.addColorStop(0.35,hexToRgba(backgroundColor,backgroundAlpha*0.55));
+  coordGradient.addColorStop(0.70,hexToRgba(backgroundColor,backgroundAlpha*0.20));
   coordGradient.addColorStop(1,hexToRgba(backgroundColor,0));
   ctx.fillStyle=coordGradient;
   ctx.fill();
