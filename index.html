@@ -1,0 +1,697 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#0f172a">
+<meta name="description" content="Tambahkan timestamp bergaya Gen 2 ke foto secara lokal di browser.">
+<title>FotoStamp — Timestamp Foto Gen 2 Versi 7</title>
+<style>
+:root{
+  --bg:#f5f7fb;--card:#fff;--text:#172033;--muted:#667085;--line:#e4e7ec;
+  --primary:#155eef;--primary-dark:#004eeb;--soft:#eef4ff;--danger:#d92d20;
+  --shadow:0 8px 30px rgba(16,24,40,.07);--radius:16px
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",Arial,sans-serif}
+button,input,select{font:inherit}
+.app{min-height:100vh}
+.header{background:#0f172a;color:#fff}
+.header-inner{max-width:1120px;margin:auto;padding:18px 20px;display:flex;align-items:center;justify-content:space-between;gap:16px}
+.brand{display:flex;align-items:center;gap:11px}
+.brand-icon{width:40px;height:40px;border-radius:11px;background:#fff;color:#0f172a;display:grid;place-items:center;font-size:21px}
+.brand-title{font-weight:800;letter-spacing:-.02em}.brand-sub{font-size:12px;color:#b8c2d1;margin-top:2px}
+.privacy{font-size:12px;color:#cbd5e1;display:flex;align-items:center;gap:6px}
+.container{max-width:1120px;margin:auto;padding:24px 20px 36px}
+.intro{margin-bottom:18px}.intro h1{font-size:25px;margin:0 0 5px;letter-spacing:-.025em}.intro p{margin:0;color:var(--muted);font-size:14px}
+.layout{display:grid;grid-template-columns:360px minmax(0,1fr);gap:18px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow)}
+.controls{padding:18px}
+.section-title{font-size:14px;font-weight:800;margin:0 0 12px}
+.drop{border:1.5px dashed #b8c1cf;background:#fafbfc;border-radius:12px;padding:21px 14px;text-align:center;cursor:pointer;transition:.15s}
+.drop:hover,.drop.drag{border-color:var(--primary);background:var(--soft)}
+.drop-icon{font-size:27px;margin-bottom:5px}.drop strong{display:block;font-size:14px}.drop span{display:block;font-size:12px;color:var(--muted);margin-top:4px}
+.file-name{margin-top:8px;font-size:12px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+input[type=file]{display:none}
+label{display:block;font-size:12px;font-weight:750;margin:16px 0 6px}
+.input-wrap{display:flex;gap:7px}.input-wrap input{flex:1}
+input[type=text],input[type=date],input[type=time],select{
+  width:100%;height:42px;padding:0 11px;border:1px solid #d0d5dd;border-radius:9px;background:#fff;color:var(--text);outline:none
+}
+.address-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.address-grid > div:last-child{grid-column:1 / -1}
+.sub-label{font-size:11px;font-weight:700;margin:8px 0 5px;color:var(--muted)}
+
+#mapsLocation{font-size:14px}
+input:focus,select:focus{border-color:var(--primary);box-shadow:0 0 0 3px rgba(21,94,239,.10)}
+.paste{height:42px;padding:0 12px;border:1px solid #d0d5dd;background:#fff;color:#344054;border-radius:9px;font-weight:700;cursor:pointer}
+.paste:hover{background:#f9fafb}
+.hint{font-size:11px;color:var(--muted);line-height:1.45;margin-top:6px}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.options{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.range-row{display:flex;align-items:center;gap:9px}.range-row input{flex:1}.range-value{width:38px;text-align:right;font-size:12px;color:var(--muted)}
+input[type=range]{accent-color:var(--primary)}
+input[type=color]{width:100%;height:42px;padding:3px;border:1px solid #d0d5dd;border-radius:9px;background:#fff;cursor:pointer}
+.color-input{display:flex;align-items:center;gap:8px}
+.color-input input[type=color]{flex:1}
+.opacity-value{width:45px;text-align:right;font-size:12px;color:var(--muted)}
+.opacity-control{gap:7px}
+.opacity-number{width:58px;height:36px;padding:0 7px;border:1px solid #d0d5dd;border-radius:8px;background:#fff;color:var(--text);text-align:center;outline:none;font-size:12px}
+.opacity-number:focus{border-color:var(--primary);box-shadow:0 0 0 3px rgba(21,94,239,.10)}
+.opacity-unit{font-size:12px;color:var(--muted);margin-left:-3px}
+.check-row{display:flex;align-items:center;gap:9px;margin-top:13px;padding:9px 10px;border:1px solid var(--line);border-radius:9px;background:#fafbfc}
+.check-row input{width:17px;height:17px;accent-color:var(--primary);cursor:pointer}
+.check-row label{margin:0;font-size:12px;font-weight:750;cursor:pointer}
+.actions{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:18px}
+.btn{height:43px;border:0;border-radius:9px;font-weight:800;cursor:pointer}.btn-primary{background:var(--primary);color:#fff}.btn-primary:hover{background:var(--primary-dark)}
+.btn-secondary{background:#eef2f6;color:#344054}.btn:disabled{opacity:.45;cursor:not-allowed}
+.status{margin-top:11px;padding:9px 10px;border-radius:8px;background:#f8fafc;color:var(--muted);font-size:11px;line-height:1.4}
+.preview-card{padding:14px;display:flex;flex-direction:column;min-width:0}
+.preview-head{display:flex;align-items:center;justify-content:space-between;padding:3px 3px 11px}
+.preview-title{font-size:13px;font-weight:800}.preview-size{font-size:11px;color:var(--muted)}
+.preview{min-height:540px;flex:1;background:#0b1220;border-radius:12px;display:flex;align-items:center;justify-content:center;overflow:hidden;padding:10px}
+.preview canvas{display:block;max-width:100%;max-height:700px;width:auto;height:auto;border-radius:3px}
+.empty{color:#94a3b8;text-align:center;font-size:13px;padding:30px}.empty-icon{font-size:34px;margin-bottom:8px}
+.footer-note{max-width:1120px;margin:14px auto 0;padding:0 20px;color:#98a2b3;font-size:11px;text-align:center}
+@media(max-width:850px){
+  .layout{grid-template-columns:1fr}.preview{min-height:360px}.preview canvas{max-height:560px}
+}
+@media(max-width:500px){
+  .container{padding:17px 12px 25px}.header-inner{padding:15px 13px}.privacy{display:none}
+  .controls{padding:14px}.actions{grid-template-columns:1fr}.options{grid-template-columns:1fr}
+  .address-grid{grid-template-columns:1fr}.address-grid .address-wide{grid-column:auto}
+  .preview{min-height:280px}.intro h1{font-size:22px}
+}
+</style>
+</head>
+<body>
+<div class="app">
+<header class="header">
+  <div class="header-inner">
+    <div class="brand">
+      <div class="brand-icon">📷</div>
+      <div>
+        <div class="brand-title">FotoStamp</div>
+        <div class="brand-sub">Timestamp foto — Gen 2 Versi 7</div>
+      </div>
+    </div>
+    <div class="privacy">🔒 Foto diproses di perangkat</div>
+  </div>
+</header>
+
+<main class="container">
+  <div class="intro">
+    <h1>Tambahkan Timestamp ke Foto — Gen 2 Versi 7</h1>
+    <p>Masukkan koordinat dari Google Maps, tanggal, dan waktu. Hasil diproses langsung di browser dengan desain timestamp Gen 2.</p>
+  </div>
+
+  <div class="layout">
+    <section class="card controls">
+      <h2 class="section-title">1. Pilih Foto</h2>
+      <div id="drop" class="drop" role="button" tabindex="0" aria-label="Pilih foto">
+        <div class="drop-icon">⬆️</div>
+        <strong>Klik untuk memilih foto</strong>
+        <span>atau tarik foto ke area ini</span>
+        <input id="file" type="file" accept="image/*">
+      </div>
+      <div id="fileName" class="file-name">Belum ada foto dipilih</div>
+
+      <h2 class="section-title" style="margin-top:20px">2. Informasi Timestamp</h2>
+
+      <label for="mapsLocation">Lokasi Google Maps</label>
+      <input id="mapsLocation" type="text" inputmode="decimal" autocomplete="off"
+             placeholder="-2.5639942720543907, 115.0435160264135">
+      <div class="hint">Salin koordinat dari Google Maps, lalu tempel ke kolom ini.</div>
+
+      <label>Alamat</label>
+      <div class="address-grid">
+        <div>
+          <label for="desa" class="sub-label">Desa</label>
+          <input id="desa" type="text" autocomplete="off" placeholder="Contoh: Kandangan Utara">
+        </div>
+        <div>
+          <label for="kecamatan" class="sub-label">Kec.</label>
+          <input id="kecamatan" type="text" autocomplete="off" placeholder="Contoh: Kandangan">
+        </div>
+        <div class="address-wide">
+          <label for="kabupaten" class="sub-label">Kabupaten</label>
+          <input id="kabupaten" type="text" autocomplete="off" value="Hulu Sungai Selatan">
+        </div>
+        <div>
+          <label for="provinsi" class="sub-label">Provinsi</label>
+          <input id="provinsi" type="text" autocomplete="off" value="Kalimantan Selatan">
+        </div>
+        <div>
+          <label for="kodePos" class="sub-label">Kode Pos</label>
+          <input id="kodePos" type="text" inputmode="numeric" autocomplete="off" value="71275" maxlength="5">
+        </div>
+      </div>
+      <div class="hint">Output alamat disusun seperti Versi 3: Desa + Kec. pada baris pertama, Kabupaten pada baris kedua, Provinsi + Kode Pos pada baris ketiga. Semua teks otomatis Proper Case.</div>
+
+      <div class="row">
+        <div><label for="date">Tanggal</label><input id="date" type="date"></div>
+        <div><label for="time">Jam</label><input id="time" type="time" step="1"></div>
+      </div>
+
+      <h2 class="section-title" style="margin-top:20px">3. Tampilan</h2>
+      <div class="options">
+        <div>
+          <label for="position" style="margin-top:0">Posisi</label>
+          <select id="position">
+            <option value="bottom-right">Kanan bawah</option>
+            <option value="bottom-left" selected>Kiri bawah</option>
+            <option value="top-right">Kanan atas</option>
+            <option value="top-left">Kiri atas</option>
+          </select>
+        </div>
+        <div>
+          <label for="size" style="margin-top:0">Ukuran teks</label>
+          <div class="range-row">
+            <input id="size" type="range" min="16" max="80" value="32">
+            <span id="sizeValue" class="range-value">32</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="options" style="margin-top:2px">
+        <div>
+          <label for="fontFamily" style="margin-top:0">Jenis font</label>
+          <select id="fontFamily">
+            <option value="Arial">Arial</option>
+            <option value="Verdana">Verdana</option>
+            <option value="Tahoma">Tahoma</option>
+            <option value="Georgia">Georgia</option>
+            <option value="Times New Roman">Times New Roman</option>
+            <option value="Courier New">Courier New</option>
+            <option value="Trebuchet MS">Trebuchet MS</option>
+            <option value="Segoe UI" selected>Segoe UI</option>
+          </select>
+        </div>
+        <div>
+          <label for="fontColor" style="margin-top:0">Warna font</label>
+          <div class="color-input">
+            <input id="fontColor" type="color" value="#ffffff" title="Pilih warna font">
+          </div>
+        </div>
+      </div>
+
+      <div class="options" style="margin-top:2px">
+        <div>
+          <label for="bgColor" style="margin-top:0">Warna background teks</label>
+          <div class="color-input">
+            <input id="bgColor" type="color" value="#000000" title="Pilih warna background teks">
+          </div>
+        </div>
+        <div>
+          <label for="bgOpacity" style="margin-top:0">Transparansi background</label>
+          <div class="range-row opacity-control">
+            <input id="bgOpacity" type="range" min="0" max="100" value="62">
+            <input id="bgOpacityNumber" class="opacity-number" type="number" min="0" max="100" value="62" inputmode="numeric" aria-label="Nilai transparansi background dalam persen">
+            <span class="opacity-unit">%</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="check-row">
+        <input id="boldText" type="checkbox" checked>
+        <label for="boldText">Bold / tebalkan teks timestamp</label>
+      </div>
+
+      <div class="check-row">
+        <input id="showTimemark" type="checkbox" checked>
+        <label for="showTimemark">Tampilkan logo Timemark</label>
+      </div>
+
+      <div class="actions">
+        <button id="process" class="btn btn-primary" disabled>Tambahkan Timestamp</button>
+        <button id="reset" class="btn btn-secondary">Reset</button>
+      </div>
+      <button id="download" class="btn btn-secondary" style="width:100%;margin-top:9px" disabled>Download Foto</button>
+      <div id="status" class="status">Belum ada foto.</div>
+    </section>
+
+    <section class="card preview-card">
+      <div class="preview-head">
+        <div class="preview-title">Preview Hasil — Gen 2 Versi 7</div>
+        <div id="previewSize" class="preview-size">—</div>
+      </div>
+      <div id="preview" class="preview">
+        <div class="empty"><div class="empty-icon">🖼️</div>Pilih foto untuk melihat preview</div>
+      </div>
+    </section>
+  </div>
+</main>
+<div class="footer-note">Foto tidak diunggah ke server. Seluruh proses timestamp dilakukan secara lokal di browser.</div>
+</div>
+
+<script>
+const $=id=>document.getElementById(id);
+const fileInput=$("file"),drop=$("drop"),processBtn=$("process"),downloadBtn=$("download");
+const preview=$("preview"),status=$("status"),size=$("size"),sizeValue=$("sizeValue");
+const fontFamily=$("fontFamily"),fontColor=$("fontColor"),bgColor=$("bgColor"),
+      bgOpacity=$("bgOpacity"),bgOpacityValue=$("bgOpacityValue"),
+      bgOpacityNumber=$("bgOpacityNumber");
+const desaInput=$("desa"),kecamatanInput=$("kecamatan"),kabupatenInput=$("kabupaten"),
+      provinsiInput=$("provinsi"),kodePosInput=$("kodePos"),boldText=$("boldText"),
+      showTimemark=$("showTimemark");
+let originalImage=null,outputBlob=null,originalFileName="foto";
+
+function pad(n){return String(n).padStart(2,"0")}
+
+function setNow(){
+  const d=new Date();
+  $("date").value=`${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+  $("time").value=`${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
+}
+setNow();
+
+size.addEventListener("input",()=>sizeValue.textContent=size.value);
+
+function syncOpacity(value){
+  let v=Number(value);
+  if(!Number.isFinite(v))v=62;
+  v=Math.max(0,Math.min(100,Math.round(v)));
+  bgOpacity.value=String(v);
+  bgOpacityNumber.value=String(v);
+  bgOpacityValue.textContent=`${v}%`;
+}
+
+bgOpacity.addEventListener("input",()=>syncOpacity(bgOpacity.value));
+bgOpacityNumber.addEventListener("input",()=>syncOpacity(bgOpacityNumber.value));
+bgOpacityNumber.addEventListener("blur",()=>syncOpacity(bgOpacityNumber.value));
+
+drop.addEventListener("click",()=>fileInput.click());
+drop.addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===" ")fileInput.click()});
+fileInput.addEventListener("change",e=>{if(e.target.files[0])loadImage(e.target.files[0])});
+["dragenter","dragover"].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault();drop.classList.add("drag")}));
+["dragleave","drop"].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault();drop.classList.remove("drag")}));
+drop.addEventListener("drop",e=>{const f=e.dataTransfer.files[0];if(f)loadImage(f)});
+
+function loadImage(file){
+  if(!file.type.startsWith("image/")){setStatus("File harus berupa gambar.",true);return}
+  const reader=new FileReader();
+  reader.onload=e=>{
+    const img=new Image();
+    img.onload=()=>{
+      originalImage=img;
+      originalFileName=file.name.replace(/\.[^/.]+$/,"");
+      $("fileName").textContent=file.name;
+      $("previewSize").textContent=`${img.naturalWidth.toLocaleString("id-ID")} × ${img.naturalHeight.toLocaleString("id-ID")} px`;
+      processBtn.disabled=false;
+      downloadBtn.disabled=true;
+      outputBlob=null;
+      preview.innerHTML="";
+      const c=document.createElement("canvas");
+      c.width=img.naturalWidth;c.height=img.naturalHeight;
+      c.getContext("2d").drawImage(img,0,0);
+      preview.appendChild(c);
+      setStatus("Foto siap diproses.");
+    };
+    img.src=e.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+
+function parseMapsLocation(value){
+  const text=String(value).trim();
+  const cleaned=text.replace(/[()]/g,"").trim();
+  const match=cleaned.match(/^\s*([+-]?(?:\d+(?:[.,]\d+)?|[.,]\d+))\s*,\s*([+-]?(?:\d+(?:[.,]\d+)?|[.,]\d+))\s*$/);
+  if(!match)return null;
+  const lat=Number(match[1].replace(",","."));
+  const lon=Number(match[2].replace(",","."));
+  if(!Number.isFinite(lat)||!Number.isFinite(lon)||lat<-90||lat>90||lon<-180||lon>180)return null;
+  return {lat,lon};
+}
+
+function setStatus(text,error=false){
+  status.textContent=text;
+  status.style.color=error?"#b42318":"#667085";
+  status.style.background=error?"#fff1f0":"#f8fafc";
+}
+
+function valid(){
+  if(!originalImage){setStatus("Pilih foto terlebih dahulu.",true);return null}
+  const coords=parseMapsLocation($("mapsLocation").value);
+  if(!coords){
+    setStatus("Koordinat tidak valid. Contoh: -2.5639942720543907, 115.0435160264135",true);
+    return null;
+  }
+  if(!$("date").value||!$("time").value){
+    setStatus("Tanggal dan jam harus diisi.",true);return null;
+  }
+  return coords;
+}
+
+function dateParts(){
+  const [y,m,d]=$("date").value.split("-");
+  return {y,m,d};
+}
+
+function dayName(dateValue){
+  const d=new Date(dateValue+"T00:00:00");
+  return new Intl.DateTimeFormat("id-ID",{weekday:"long"}).format(d);
+}
+
+function dateText(){
+  const {y,m,d}=dateParts();
+  const bulanIndonesia=[
+    "Januari","Februari","Maret","April","Mei","Juni",
+    "Juli","Agustus","September","Oktober","November","Desember"
+  ];
+  return `${d} ${bulanIndonesia[Number(m)-1]} ${y}`;
+}
+
+function roundedRect(ctx,x,y,w,h,r){
+  const rr=Math.min(r,w/2,h/2);
+  ctx.beginPath();
+  ctx.moveTo(x+rr,y);
+  ctx.arcTo(x+w,y,x+w,y+h,rr);
+  ctx.arcTo(x+w,y+h,x,y+h,rr);
+  ctx.arcTo(x,y+h,x,y,rr);
+  ctx.arcTo(x,y,x+w,y,rr);
+  ctx.closePath();
+}
+
+function hexToRgba(hex,alpha){
+  const h=hex.replace("#","");
+  const n=parseInt(h,16);
+  const r=(n>>16)&255,g=(n>>8)&255,b=n&255;
+  return `rgba(${r},${g},${b},${alpha})`;
+}
+
+function properCase(value){
+  return String(value||"")
+    .trim()
+    .toLocaleLowerCase("id-ID")
+    .replace(/(^|[\s\-/'’])([a-zà-ÿ])/gi,(m,p,c)=>p+c.toLocaleUpperCase("id-ID"));
+}
+
+function properAddressPart(value){
+  let text=properCase(value);
+  // Pertahankan singkatan yang memang digunakan pada output.
+  text=text.replace(/\bKec\.\b/gi,"Kec.");
+  text=text.replace(/\bKab\.\b/gi,"Kab.");
+  return text;
+}
+
+function coordinateLabel(value,isLatitude){
+  if(isLatitude){
+    return value < 0 ? "S" : "N";
+  }
+  return value < 0 ? "W" : "E";
+}
+
+function coordinateText(lat,lon){
+  const latDir=coordinateLabel(lat,true);
+  const lonDir=coordinateLabel(lon,false);
+  return `${Math.abs(lat).toFixed(6)}°${latDir}, ${Math.abs(lon).toFixed(6)}°${lonDir}`;
+}
+
+function fitAddressLines(ctx,text,maxWidth,maxLines){
+  if(!text)return [];
+  const words=text.trim().split(/\s+/);
+  const lines=[];let line="";
+  for(const word of words){
+    const test=line?line+" "+word:word;
+    if(ctx.measureText(test).width<=maxWidth){
+      line=test;
+    }else{
+      if(line)lines.push(line);
+      line=word;
+      if(lines.length===maxLines-1)break;
+    }
+  }
+  if(lines.length<maxLines && line)lines.push(line);
+
+  const used=lines.join(" ").split(/\s+/).filter(Boolean).length;
+  if(used<words.length && lines.length){
+    let last=lines[lines.length-1];
+    while(ctx.measureText(last+"…").width>maxWidth && last.length>1){
+      last=last.slice(0,-1);
+    }
+    lines[lines.length-1]=last+"…";
+  }
+  return lines;
+}
+
+function verificationCode(){
+  const chars="ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+  let out="";
+  for(let i=0;i<12;i++)out+=chars[Math.floor(Math.random()*chars.length)];
+  return out;
+}
+
+processBtn.addEventListener("click",()=>{
+  const coords=valid();if(!coords)return;
+
+  const canvas=document.createElement("canvas");
+  const ctx=canvas.getContext("2d");
+  canvas.width=originalImage.naturalWidth;
+  canvas.height=originalImage.naturalHeight;
+  ctx.drawImage(originalImage,0,0);
+
+  const s=Number(size.value);
+  const fontName=fontFamily.value||"Arial";
+  const textColor=fontColor.value||"#ffffff";
+  const backgroundColor=bgColor.value||"#000000";
+  const backgroundAlpha=Number(bgOpacity.value)/100;
+  const weight=boldText.checked?"700":"400";
+  const font=`${weight} ${s}px "${fontName}", Arial, sans-serif`;
+  const accent="#f5b51b";
+
+  // Semua elemen output diskalakan terhadap ukuran font agar konsisten
+  // pada foto portrait maupun landscape.
+  const margin=Math.max(12,Math.round(s*.8));
+  const gap=Math.max(4,Math.round(s*.20));
+  // Proporsi disetel mengikuti referensi: jam dominan, tanggal/hari
+  // lebih kecil dan rapat di sisi kanan divider.
+  const smallFont=Math.max(10,Math.round(s*.64));
+  const addressFont=Math.max(10,Math.round(s*.68));
+  const coordFont=Math.max(10,Math.round(s*.64));
+
+  ctx.textBaseline="top";
+  ctx.font=`${weight} ${s*1.78}px "${fontName}", Arial, sans-serif`;
+  const timeText=$("time").value.slice(0,5);
+
+  ctx.font=font;
+  const dateLine=dateText();
+  const weekday=dayName($("date").value);
+  const line1=coordinateText(coords.lat,coords.lon);
+
+  const desa=properAddressPart(desaInput.value);
+  const kecamatan=properAddressPart(kecamatanInput.value);
+  const kabupaten=properAddressPart(kabupatenInput.value);
+  const provinsi=properAddressPart(provinsiInput.value);
+  const kodePos=String(kodePosInput.value||"").replace(/\D/g,"").slice(0,5);
+
+  // Susunan alamat mengikuti referensi foto:
+  // Baris 1: Desa, Kec. ...
+  // Baris 2: Kabupaten ...
+  // Baris 3: Provinsi + kode pos
+  // Format alamat mengikuti Versi 3:
+  // Baris 1 : Desa, Kec. Kecamatan,
+  // Baris 2 : Kabupaten Kabupaten,
+  // Baris 3 : Provinsi Kode Pos
+  const addressLines=[];
+  // Koma akhir adalah bagian dari format output, bukan pemisah antar-field.
+  // Dengan demikian posisi baris tetap sama: Desa, Kec. Kecamatan, / Kabupaten Kabupaten, / Provinsi Kode Pos.
+  const lineAlamat1=[desa,kecamatan ? `Kec. ${kecamatan}` : ""].filter(Boolean).join(", ") + (kecamatan ? "," : "");
+  const lineAlamat2=kabupaten ? `Kabupaten ${kabupaten},` : "";
+  const lineAlamat3=[provinsi,kodePos].filter(Boolean).join(" ");
+
+  if(lineAlamat1)addressLines.push(lineAlamat1);
+  if(lineAlamat2)addressLines.push(lineAlamat2);
+  if(lineAlamat3)addressLines.push(lineAlamat3);
+
+  // Ukuran blok informasi utama.
+  ctx.font=`${weight} ${smallFont}px "${fontName}", Arial, sans-serif`;
+  const dateW=ctx.measureText(dateLine).width;
+  const dayW=ctx.measureText(weekday).width;
+  const sideW=Math.max(dateW,dayW);
+
+  ctx.font=`${weight} ${s*1.78}px "${fontName}", Arial, sans-serif`;
+  const timeW=ctx.measureText(timeText).width;
+
+  const dividerGap=Math.round(s*.36);
+  const dividerW=Math.max(2,Math.round(s*.075));
+  const infoW=timeW+dividerGap+dividerW+dividerGap+sideW;
+
+  ctx.font=`${weight} ${addressFont}px "${fontName}", Arial, sans-serif`;
+  const addressMax=Math.min(canvas.width-margin*2,Math.max(infoW,canvas.width*.72));
+  const fittedAddressLines=[];
+  addressLines.forEach(line=>{
+    fitAddressLines(ctx,line,addressMax,2).forEach(part=>fittedAddressLines.push(part));
+  });
+
+  // Satu enter kosong antara tanggal dan hari.
+  // Gap = satu tinggi baris font tanggal/hari.
+  const dateDayGap=Math.max(1,Math.round(smallFont*1.15));
+  const timeH=s*1.92;
+  const dateH=smallFont*2+dateDayGap;
+  const addressH=fittedAddressLines.length?fittedAddressLines.length*(addressFont*1.22):0;
+  const infoGap=addressLines.length?Math.round(s*.38):0;
+
+  // Koordinat dibuat sebagai pill terpisah seperti contoh Gen 2.
+  ctx.font=`${weight} ${coordFont}px "${fontName}", Arial, sans-serif`;
+  const coordPadX=Math.round(s*.65);
+  const coordPadY=Math.round(s*.38);
+  const coordTextW=ctx.measureText(line1).width;
+  const coordW=Math.min(canvas.width-margin*2,coordTextW+coordPadX*2);
+  const coordH=coordFont+coordPadY*2;
+  const coordGap=Math.round(s*.48);
+
+  const mainH=Math.max(timeH,dateH)+infoGap+addressH;
+  const totalH=mainH+coordGap+coordH;
+  const blockW=Math.max(infoW,addressMax>0?Math.min(addressMax,canvas.width-margin*2):0,coordW);
+
+  let x=positionX($("position").value,canvas.width,blockW,margin);
+  let y=positionY($("position").value,canvas.height,totalH,margin);
+
+  // Untuk posisi kanan, teks tetap rata kiri di dalam blok agar menyerupai
+  // layout contoh, tetapi blok ditempatkan di sisi kanan.
+  x=Math.max(margin,Math.min(x,canvas.width-blockW-margin));
+  y=Math.max(margin,Math.min(y,canvas.height-totalH-margin));
+
+  ctx.save();
+
+  // --- BLOK UTAMA: waktu + tanggal + hari ---
+  const timeFontSize=s*1.78;
+  ctx.textBaseline="top";
+  ctx.font=`${weight} ${timeFontSize}px "${fontName}", Arial, sans-serif`;
+  ctx.fillStyle=textColor;
+  ctx.shadowColor="rgba(0,0,0,.48)";
+  ctx.shadowBlur=Math.max(2,s*.14);
+  ctx.shadowOffsetX=0;
+  ctx.shadowOffsetY=Math.max(1,s*.06);
+  ctx.fillText(timeText,x,y);
+
+  const dividerX=x+timeW+dividerGap;
+  const topInfoY=y+Math.round(s*.03);
+  ctx.shadowColor="transparent";
+  ctx.fillStyle=accent;
+  ctx.fillRect(dividerX,topInfoY,dividerW,timeH-Math.round(s*.08));
+
+  const sideX=dividerX+dividerW+dividerGap;
+  ctx.fillStyle=textColor;
+  ctx.font=`${weight} ${smallFont}px "${fontName}", Arial, sans-serif`;
+  ctx.fillText(dateLine,sideX,topInfoY);
+  ctx.fillText(weekday,sideX,topInfoY+smallFont+dateDayGap);
+
+  // --- ALAMAT ---
+  if(fittedAddressLines.length){
+    ctx.font=`${weight} ${addressFont}px "${fontName}", Arial, sans-serif`;
+    ctx.fillStyle=textColor;
+    ctx.shadowColor="rgba(0,0,0,.50)";
+    ctx.shadowBlur=Math.max(2,s*.12);
+    const ay=y+Math.max(timeH,dateH)+infoGap;
+    fittedAddressLines.forEach((line,i)=>{
+      ctx.fillText(line,x,ay+i*addressFont*1.22);
+    });
+  }
+
+  // --- KOORDINAT PILL ---
+  const coordY=y+mainH+coordGap;
+  ctx.shadowColor="transparent";
+  roundedRect(ctx,x,coordY,coordW,coordH,Math.round(s*.22));
+  ctx.fillStyle=hexToRgba(backgroundColor,backgroundAlpha);
+  ctx.fill();
+
+  ctx.fillStyle=textColor;
+  ctx.font=`${weight} ${coordFont}px "${fontName}", Arial, sans-serif`;
+  ctx.textBaseline="top";
+  ctx.shadowColor="rgba(0,0,0,.35)";
+  ctx.shadowBlur=Math.max(1,s*.08);
+  ctx.fillText(line1,x+coordPadX,coordY+coordPadY);
+
+  ctx.restore();
+
+  // --- LOGO TIMEMARK KANAN ATAS ---
+  if(showTimemark.checked){
+      // Tidak terpengaruh oleh opacity background timestamp.
+      ctx.save();
+      const wmMargin=Math.max(12,Math.round(s*.8));
+      const wmBig=Math.max(12,Math.round(s*.88));
+      const wmSmall=Math.max(8,Math.round(s*.58));
+      ctx.textAlign="right";
+      ctx.textBaseline="top";
+      ctx.shadowColor="rgba(0,0,0,.40)";
+      ctx.shadowBlur=Math.max(2,s*.10);
+      ctx.font=`800 ${wmBig}px "${fontName}", Arial, sans-serif`;
+      const wmX=canvas.width-wmMargin;
+      const wmY=wmMargin*.55;
+      const tmWidth=ctx.measureText("Timemark").width;
+      const markWidth=ctx.measureText("mark").width;
+      const timeWidth=ctx.measureText("Time").width;
+      ctx.fillStyle="#f5b51b";
+      ctx.fillText("Time",wmX-(markWidth+2),wmY);
+      ctx.fillStyle=textColor;
+      ctx.fillText("mark",wmX,wmY);
+
+      ctx.font=`${weight} ${wmSmall}px "${fontName}", Arial, sans-serif`;
+      ctx.fillText("Foto 100% akurat",wmX,wmY+wmBig*1.10);
+      ctx.restore();
+
+  }
+
+  preview.innerHTML="";
+  preview.appendChild(canvas);
+
+  canvas.toBlob(blob=>{
+    if(!blob){
+      setStatus("Gagal membuat file hasil.",true);
+      return;
+    }
+    outputBlob=blob;
+    downloadBtn.disabled=false;
+    setStatus("Timestamp Gen 2 Versi 7 berhasil ditambahkan. Foto siap diunduh.");
+  },"image/jpeg",.95);
+});
+
+function positionX(position,canvasW,blockW,margin){
+  return position.includes("right") ? canvasW-blockW-margin : margin;
+}
+function positionY(position,canvasH,blockH,margin){
+  return position.includes("bottom") ? canvasH-blockH-margin : margin;
+}
+
+downloadBtn.addEventListener("click",()=>{
+  if(!outputBlob)return;
+  const a=document.createElement("a");
+  const safe=(originalFileName||"foto").replace(/[<>:"/\\|?*]+/g,"_");
+  a.href=URL.createObjectURL(outputBlob);
+  a.download=safe+"_timestamp_gen2_v7.jpg";
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(()=>URL.revokeObjectURL(a.href),1000);
+});
+
+$("reset").addEventListener("click",()=>{
+  originalImage=null;outputBlob=null;fileInput.value="";
+  $("mapsLocation").value="";
+  desaInput.value="";
+  kecamatanInput.value="";
+  kabupatenInput.value="Hulu Sungai Selatan";
+  provinsiInput.value="Kalimantan Selatan";
+  kodePosInput.value="71275";
+  setNow();
+  fontFamily.value="Segoe UI";
+  fontColor.value="#ffffff";
+  bgColor.value="#000000";
+  bgOpacity.value="62";
+  bgOpacityNumber.value="62";
+  size.value="32";
+  sizeValue.textContent="32";
+  bgOpacityValue.textContent="62%";
+  boldText.checked=true;
+  showTimemark.checked=true;
+  $("position").value="bottom-left";
+  $("fileName").textContent="Belum ada foto dipilih";
+  $("previewSize").textContent="—";
+  processBtn.disabled=true;downloadBtn.disabled=true;
+  preview.innerHTML='<div class="empty"><div class="empty-icon">🖼️</div>Pilih foto untuk melihat preview</div>';
+  setStatus("Formulir telah direset.");
+});
+</script>
+</body>
+</html>
