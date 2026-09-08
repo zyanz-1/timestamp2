@@ -165,8 +165,8 @@ input[type=color]{width:100%;height:42px;padding:3px;border:1px solid #d0d5dd;bo
         <div>
           <label for="size" style="margin-top:0">Ukuran teks</label>
           <div class="range-row">
-            <input id="size" type="range" min="16" max="80" value="32">
-            <span id="sizeValue" class="range-value">32</span>
+            <input id="size" type="range" min="16" max="200" value="32">
+            <input id="sizeNumber" type="number" min="16" max="200" value="32" style="flex:0 0 70px;width:70px;height:42px;padding:0 9px;border:1px solid #d0d5dd;border-radius:9px;background:#fff;color:var(--text);outline:none;text-align:center">
           </div>
         </div>
       </div>
@@ -245,7 +245,7 @@ input[type=color]{width:100%;height:42px;padding:3px;border:1px solid #d0d5dd;bo
 <script>
 const $=id=>document.getElementById(id);
 const fileInput=$("file"),drop=$("drop"),processBtn=$("process"),downloadBtn=$("download");
-const preview=$("preview"),status=$("status"),size=$("size"),sizeValue=$("sizeValue");
+const preview=$("preview"),status=$("status"),size=$("size"),sizeNumber=$("sizeNumber");
 const fontFamily=$("fontFamily"),fontColor=$("fontColor"),bgColor=$("bgColor"),
       bgOpacity=$("bgOpacity"),bgOpacityValue=$("bgOpacityValue"),
       bgOpacityNumber=$("bgOpacityNumber");
@@ -263,7 +263,19 @@ function setNow(){
 }
 setNow();
 
-size.addEventListener("input",()=>sizeValue.textContent=size.value);
+function syncSizeFromRange(){
+  sizeNumber.value=size.value;
+}
+function syncSizeFromNumber(){
+  let v=Math.round(Number(sizeNumber.value));
+  if(!Number.isFinite(v))v=32;
+  v=Math.max(16,Math.min(200,v));
+  sizeNumber.value=v;
+  size.value=v;
+}
+size.addEventListener("input",syncSizeFromRange);
+sizeNumber.addEventListener("input",syncSizeFromNumber);
+sizeNumber.addEventListener("change",syncSizeFromNumber);
 
 function syncOpacity(value){
   let v=Number(value);
@@ -688,7 +700,7 @@ $("reset").addEventListener("click",()=>{
   bgOpacity.value="40";
   bgOpacityNumber.value="40";
   size.value="32";
-  sizeValue.textContent="32";
+  sizeNumber.value="32";
   bgOpacityValue.textContent="40%";
   boldText.checked=true;
   showTimemark.checked=true;
