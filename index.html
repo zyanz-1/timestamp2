@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="theme-color" content="#0f172a">
 <meta name="description" content="Tambahkan timestamp bergaya Gen 2 ke foto secara lokal di browser.">
-<title>FotoStamp — Timestamp Foto Gen 2 Versi 12</title>
+<title>FotoStamp — Timestamp Foto Gen 2 Versi 13</title>
 <style>
 :root{
   --bg:#f5f7fb;--card:#fff;--text:#172033;--muted:#667085;--line:#e4e7ec;
@@ -92,7 +92,7 @@ input[type=color]{width:100%;height:42px;padding:3px;border:1px solid #d0d5dd;bo
       <div class="brand-icon">📷</div>
       <div>
         <div class="brand-title">FotoStamp</div>
-        <div class="brand-sub">Timestamp foto — Gen 2 Versi 12</div>
+        <div class="brand-sub">Timestamp foto — Gen 2 Versi 13</div>
       </div>
     </div>
     <div class="privacy">🔒 Foto diproses di perangkat</div>
@@ -101,7 +101,7 @@ input[type=color]{width:100%;height:42px;padding:3px;border:1px solid #d0d5dd;bo
 
 <main class="container">
   <div class="intro">
-    <h1>Tambahkan Timestamp ke Foto — Gen 2 Versi 12</h1>
+    <h1>Tambahkan Timestamp ke Foto — Gen 2 Versi 13</h1>
     <p>Masukkan koordinat dari Google Maps, tanggal, dan waktu. Hasil diproses langsung di browser dengan desain timestamp Gen 2.</p>
   </div>
 
@@ -197,14 +197,14 @@ input[type=color]{width:100%;height:42px;padding:3px;border:1px solid #d0d5dd;bo
         <div>
           <label for="bgColor" style="margin-top:0">Warna background teks</label>
           <div class="color-input">
-            <input id="bgColor" type="color" value="#000000" title="Pilih warna background teks">
+            <input id="bgColor" type="color" value="#808080" title="Pilih warna background teks">
           </div>
         </div>
         <div>
           <label for="bgOpacity" style="margin-top:0">Transparansi background</label>
           <div class="range-row opacity-control">
-            <input id="bgOpacity" type="range" min="0" max="100" value="20">
-            <input id="bgOpacityNumber" class="opacity-number" type="number" min="0" max="100" value="20" inputmode="numeric" aria-label="Nilai transparansi background dalam persen">
+            <input id="bgOpacity" type="range" min="0" max="100" value="40">
+            <input id="bgOpacityNumber" class="opacity-number" type="number" min="0" max="100" value="40" inputmode="numeric" aria-label="Nilai transparansi background dalam persen">
             <span class="opacity-unit">%</span>
           </div>
         </div>
@@ -230,7 +230,7 @@ input[type=color]{width:100%;height:42px;padding:3px;border:1px solid #d0d5dd;bo
 
     <section class="card preview-card">
       <div class="preview-head">
-        <div class="preview-title">Preview Hasil — Gen 2 Versi 12</div>
+        <div class="preview-title">Preview Hasil — Gen 2 Versi 13</div>
         <div id="previewSize" class="preview-size">—</div>
       </div>
       <div id="preview" class="preview">
@@ -650,7 +650,7 @@ processBtn.addEventListener("click",()=>{
     }
     outputBlob=blob;
     downloadBtn.disabled=false;
-    setStatus("Timestamp Gen 2 Versi 12 berhasil ditambahkan. Foto siap diunduh.");
+    setStatus("Timestamp Gen 2 Versi 13 berhasil ditambahkan. Foto siap diunduh.");
   },"image/jpeg",.95);
 });
 
@@ -666,7 +666,7 @@ downloadBtn.addEventListener("click",()=>{
   const a=document.createElement("a");
   const safe=(originalFileName||"foto").replace(/[<>:"/\\|?*]+/g,"_");
   a.href=URL.createObjectURL(outputBlob);
-  a.download=safe+"_timestamp_gen2_v12.jpg";
+  a.download=safe+"_timestamp_gen2_v13.jpg";
   document.body.appendChild(a);
   a.click();
   a.remove();
@@ -684,12 +684,12 @@ $("reset").addEventListener("click",()=>{
   setNow();
   fontFamily.value="Segoe UI";
   fontColor.value="#ffffff";
-  bgColor.value="#000000";
-  bgOpacity.value="20";
-  bgOpacityNumber.value="20";
+  bgColor.value="#808080";
+  bgOpacity.value="40";
+  bgOpacityNumber.value="40";
   size.value="32";
   sizeValue.textContent="32";
-  bgOpacityValue.textContent="20%";
+  bgOpacityValue.textContent="40%";
   boldText.checked=true;
   showTimemark.checked=true;
   $("position").value="bottom-left";
